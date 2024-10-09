@@ -2,17 +2,11 @@
 
 <h2>Students</h2>
 
-@if (!Model.Any())
-{
-    <p>No students found.</p>
-}
-else
-{
-    <table class="table table-striped">
-        <tr>
-            <td>NIM</td>
-            <td>FullName</td>
-        </tr>
+ <table class="table table-striped">
+    <tr>
+        <td>NIM</td>
+        <td>FullName</td>
+    </tr>
         @foreach (var item in Model)
         {
             <tr>
@@ -20,5 +14,4 @@ else
                 <td>@item.FullName</td>
             </tr>
         }
-    </table>
-}
+</table>

@@ -1,23 +1,35 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using SampleSecureWeb.Data;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Menambahkan layanan ke dalam container
 builder.Services.AddControllersWithViews();
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddDbContext<ApplicationDbContext>(option => 
-    option.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+// Registrasi IUser dengan implementasi UserData (bukan UserRepository)
+builder.Services.AddScoped<IUser, UserData>(); // Mendaftarkan IUser dengan implementasinya UserData
 
-builder.Services.AddScoped<IStudent,StudentData>();
+// Konfigurasi autentikasi
+builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
+    .AddCookie(options =>
+    {
+        options.LoginPath = "/Account/Login"; // Jalur untuk login
+        options.AccessDeniedPath = "/Account/AccessDenied"; // Jalur untuk akses ditolak
+    });
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+// Konfigurasi middleware
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+}
+else
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
     app.UseHsts();
 }
 
@@ -26,6 +38,7 @@ app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseAuthentication(); // Mengaktifkan autentikasi
 app.UseAuthorization();
 
 app.MapControllerRoute(

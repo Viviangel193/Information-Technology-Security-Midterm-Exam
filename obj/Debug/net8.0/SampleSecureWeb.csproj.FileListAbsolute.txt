@@ -126,3 +126,5 @@ C:\Users\vivia\Downloads\Keamanan Teknologi Informasi\SampleSecureWeb\obj\Debug\
 C:\Users\vivia\Downloads\Keamanan Teknologi Informasi\SampleSecureWeb\obj\Debug\net8.0\SampleSecureWeb.pdb
 C:\Users\vivia\Downloads\Keamanan Teknologi Informasi\SampleSecureWeb\obj\Debug\net8.0\SampleSecureWeb.genruntimeconfig.cache
 C:\Users\vivia\Downloads\Keamanan Teknologi Informasi\SampleSecureWeb\obj\Debug\net8.0\ref\SampleSecureWeb.dll
+C:\Users\vivia\Downloads\Keamanan Teknologi Informasi\SampleSecureWeb\obj\Debug\net8.0\SampleSecureWeb.sourcelink.json
+C:\Users\vivia\Downloads\Keamanan Teknologi Informasi\SampleSecureWeb\bin\Debug\net8.0\BCrypt.Net-Next.dll
