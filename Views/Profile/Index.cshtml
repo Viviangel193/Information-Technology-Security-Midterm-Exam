@@ -1,0 +1,39 @@
+@model SampleSecureWeb.Models.UserProfile
+
+@{
+    ViewData["Title"] = "Profil Pengguna";
+}
+
+<h2>Profil Pengguna</h2>
+
+@if (ViewBag.Message != null)
+{
+    <div class="alert alert-success">@ViewBag.Message</div>
+}
+
+<form asp-action="Update" method="post">
+    <div class="form-group">
+        <label for="FullName">Nama Lengkap</label>
+        <input type="text" class="form-control" id="FullName" name="FullName" value="@Model.FullName" required />
+    </div>
+
+    <div class="form-group">
+        <label for="Email">Email</label>
+        <input type="email" class="form-control" id="Email" name="Email" value="@Model.Email" required />
+    </div>
+
+    <div class="form-group">
+        <label for="PhoneNumber">Nomor Telepon</label>
+        <input type="text" class="form-control" id="PhoneNumber" name="PhoneNumber" value="@Model.PhoneNumber" required />
+    </div>
+
+    <button type="submit" class="btn btn-primary">Perbarui Profil</button>
+</form>
+
+<!-- Menambahkan spasi untuk memisahkan form pembaruan dengan tombol logout -->
+<div style="margin-top: 20px;"></div>
+
+<!-- Tombol Logout di paling bawah -->
+<form asp-action="Logout" method="post" asp-controller="Account">
+    <button type="submit" class="btn btn-danger">Logout</button>
+</form>

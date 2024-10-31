@@ -1,6 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using SampleSecureWeb.Models;
 
@@ -8,42 +5,41 @@ namespace SampleSecureWeb.Data
 {
     public class UserRepository : IUser
     {
-        // Anda mungkin ingin menggunakan konteks database di sini jika menggunakan Entity Framework
-        // private readonly ApplicationDbContext _context;
+        private readonly ApplicationDbContext _context;
 
         // Constructor
-        public UserRepository(/* ApplicationDbContext context */)
+        public UserRepository(ApplicationDbContext context)
         {
-            // _context = context;
+            _context = context;
         }
 
-        public User Registration(User user)
-{
-    // Implementasi logika pendaftaran pengguna
-    // Misalnya: simpan pengguna ke dalam database
-    // Gantilah kode ini dengan logika pendaftaran yang sesuai
-
-    // Contoh sederhana:
-    user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
-    
-    // Simpan pengguna ke database (contoh, jika menggunakan EF)
-    // _context.Users.Add(user);
-    // _context.SaveChanges();
-
-    return user; // Mengembalikan objek pengguna yang telah didaftarkan
-}
-
-        public User Login(User user)
+        public async Task<User> Registration(User user)
         {
-            // Implementasi logika login pengguna
-            // Misalnya: periksa kredensial pengguna di dalam database
-            return user; // Ganti dengan logika yang sesuai
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
+            _context.Users.Add(user);  // Tambahkan pengguna ke konteks
+            await _context.SaveChangesAsync();  // Simpan perubahan ke database
+            return user;
         }
 
-        public void ChangePassword(string username, string currentPassword, string newPassword)
+        public async Task<User> Login(User user)
         {
-            // Implementasi logika untuk mengubah password pengguna
-            // Misalnya: periksa password saat ini dan perbarui dengan password baru
+            // Implement login logic here
+            return user;
+        }
+
+        public async Task ChangePassword(string username, string currentPassword, string newPassword)
+        {
+            // Logic for changing the password
+        }
+
+        public User ValidateUser(string username, string password)
+        {
+            var user = _context.Users.FirstOrDefault(u => u.UserName == username);
+            if (user != null && BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            {
+                return user; // User found and password matches
+            }
+            return null; // User not found or password does not match
         }
     }
 }

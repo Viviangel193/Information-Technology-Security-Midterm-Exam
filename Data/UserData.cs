@@ -1,5 +1,7 @@
 using System;
 using System.Linq;
+using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 using SampleSecureWeb.Models;
 
 namespace SampleSecureWeb.Data
@@ -13,15 +15,15 @@ namespace SampleSecureWeb.Data
             _db = db;
         }
 
-        public User Login(User user)
+        public async Task<User> Login(User user)
         {
-            var _user = _db.Users.FirstOrDefault(u => u.UserName == user.UserName);
+            var _user = await _db.Users.FirstOrDefaultAsync(u => u.UserName == user.UserName);
             if (_user == null)
             {
                 throw new InvalidOperationException("User not found.");
             }
 
-            if (!BCrypt.Net.BCrypt.Verify(user.Password, _user.Password))
+            if (!BCrypt.Net.BCrypt.Verify(user.PasswordHash, _user.PasswordHash))
             {
                 throw new UnauthorizedAccessException("Password is incorrect.");
             }
@@ -29,16 +31,21 @@ namespace SampleSecureWeb.Data
             return _user;
         }
 
-        public User Registration(User user)
+        public async Task<User> Registration(User user)
         {
-            // Validasi password
-            ValidatePassword(user.Password);
+            ValidatePassword(user.PasswordHash); // Validate the password strength
+            
+            // Check if user already exists
+            if (await _db.Users.AnyAsync(u => u.UserName == user.UserName))
+            {
+                throw new InvalidOperationException("User already exists.");
+            }
 
             try
             {
-                user.Password = BCrypt.Net.BCrypt.HashPassword(user.Password);
-                _db.Users.Add(user);
-                _db.SaveChanges();
+                user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(user.PasswordHash);
+                await _db.Users.AddAsync(user);
+                await _db.SaveChangesAsync();
                 return user;
             }
             catch (Exception ex)
@@ -47,24 +54,38 @@ namespace SampleSecureWeb.Data
             }
         }
 
-        public void ChangePassword(string username, string currentPassword, string newPassword)
+        public async Task ChangePassword(string username, string currentPassword, string newPassword)
         {
-            var user = _db.Users.FirstOrDefault(u => u.UserName == username);
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.UserName == username);
             if (user == null)
             {
                 throw new InvalidOperationException("User not found.");
             }
 
-            if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.Password))
+            if (!BCrypt.Net.BCrypt.Verify(currentPassword, user.PasswordHash))
             {
                 throw new UnauthorizedAccessException("Current password is incorrect.");
             }
 
-            // Validasi password baru
             ValidatePassword(newPassword);
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(newPassword);
+            await _db.SaveChangesAsync();
+        }
 
-            user.Password = BCrypt.Net.BCrypt.HashPassword(newPassword);
-            _db.SaveChanges();
+        public async Task<User> ValidateUserAsync(string username, string password)
+        {
+            var user = await _db.Users.FirstOrDefaultAsync(u => u.UserName == username);
+            if (user == null)
+            {
+                throw new InvalidOperationException("User not found.");
+            }
+
+            if (!BCrypt.Net.BCrypt.Verify(password, user.PasswordHash))
+            {
+                throw new UnauthorizedAccessException("Password is incorrect.");
+            }
+
+            return user;
         }
 
         private void ValidatePassword(string password)
@@ -76,6 +97,11 @@ namespace SampleSecureWeb.Data
             {
                 throw new ArgumentException("Password must be at least 12 characters long, contain uppercase letters, lowercase letters, and numbers.");
             }
+        }
+
+        public User ValidateUser(string username, string password)
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -1,17 +1,13 @@
-using System;
-using System.Collections.Generic;
+using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
-using System.Linq;
-using System.Threading.Tasks;
 
 namespace SampleSecureWeb.Models
 {
-    public class User
+    public class User : IdentityUser // Pastikan User mewarisi dari IdentityUser
     {
         [Key]
-        
-        public string UserName { get; set; } = null!;
-        public string Password { get; set; } = null!;
-        public string RoleName { get; set; } = null!;   
+        public int Id { get; set; } // Primary key
+
+        public string RoleName { get; set; } = string.Empty; // Atur default untuk menghindari NULL
     }
 }
